@@ -1,0 +1,44 @@
+public class Main {
+    public static void main(String[]args){
+        Print p = new PrintBanner("Hello");
+        p.printStrong();
+        p.printWeak();
+    }
+}
+
+// 委譲によるアダプタ
+// - カッコやアスタリスクで囲んで出力する機能を持つBannerが提供されている（Adapter1と同じ）
+// - Printが抽象クラスとして存在する（どういう状況？）
+// - Bannerを使ってPrintの具象クラスを実現したい
+//   - 具象クラスとしてPrintBannerを実装する。Bannerを持たせる。
+
+public class Banner {
+    private String string;
+    public Banner(String s) {
+        this.string = s;
+    }
+    public void showWithParen() {
+        System.out.println("(" + this.string + ")");
+    }
+    public void showWithAster() {
+        System.out.println("*" + this.string + "*");
+    }
+}
+
+public abstract class Print {
+    public abstract void printWeak();
+    public abstract void printStrong();
+}
+
+public class PrintBanner extends Print {
+    private Banner banner;
+    public PrintBanner(String s) {
+        this.banner = new Banner(s);
+    }
+    public void printWeak() {
+        this.banner.showWithParen();
+    }
+    public void printStrong() {
+        this.banner.showWithAster();
+    }
+}
