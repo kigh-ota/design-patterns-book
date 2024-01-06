@@ -1,0 +1,59 @@
+#!/usr/bin/java --source 18
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Date;
+import java.util.Properties;
+
+public class Exercise2 {
+    public static void main(String[]args){
+        FileIO f = new FileProperties();
+        try {
+            f.readFromFile("file.txt");
+            f.setValue("year", "2004");
+            f.setValue("month", "4");
+            f.setValue("day", "21");
+            f.writeToFile("newfile.txt");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+// java.util.Propertiesクラスがある (Adaptee)
+// FileIO interfaceがある (Target)
+
+interface FileIO {
+    void readFromFile(String filename) throws IOException;
+    void writeToFile(String filename) throws IOException;
+    void setValue(String key, String value);
+    String getValue(String key);
+}
+
+class FileProperties implements FileIO {
+    private Properties properties;
+    public FileProperties() {
+        properties = new Properties();
+    }
+
+    public void readFromFile(String filename) throws IOException {
+        try (var fis = new FileInputStream(filename)) {
+            properties.load(fis);
+        }
+    }
+
+    public void writeToFile(String filename) throws IOException {
+        try (var fos = new FileOutputStream(filename)) {
+            properties.store(fos, "written by FileProperties");
+        }
+    }
+
+    public void setValue(String key, String value) {
+        properties.setProperty(key, value);
+    }
+
+    public String getValue(String key) {
+        return properties.getProperty(key);
+    }
+}
