@@ -1,0 +1,41 @@
+public class Main {
+    public static void main(String[]args){
+        Print p = new PrintBanner("Hello");
+        p.printStrong();
+        p.printWeak();
+    }
+}
+
+// 継承によるアダプタ
+// - カッコやアスタリスクで囲んで出力する機能を持つBannerが提供されている
+// - Bannerを使ってPrintの実装を実現したい
+// - アダプタとしてPrintBanner（名前わかりにくくない？）を作ることで実現する
+public class Banner {
+    private String string;
+    public Banner(String s) {
+        this.string = s;
+    }
+    public void showWithParen() {
+        System.out.println("(" + this.string + ")");
+    }
+    public void showWithAster() {
+        System.out.println("*" + this.string + "*");
+    }
+}
+
+public interface Print {
+    public abstract void printWeak();
+    public abstract void printStrong();
+}
+
+public class PrintBanner extends Banner implements Print {
+    public PrintBanner(String s) {
+        super(s);
+    }
+    public void printWeak() {
+        showWithParen();
+    }
+    public void printStrong() {
+        showWithAster();
+    }
+}
