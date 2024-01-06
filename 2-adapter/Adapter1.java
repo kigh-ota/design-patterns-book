@@ -8,6 +8,7 @@ public class Main {
 
 // 継承によるアダプタ
 // - カッコやアスタリスクで囲んで出力する機能を持つBannerが提供されている
+// - Printインタフェースがある
 // - Bannerを使ってPrintの実装を実現したい
 // - アダプタとしてPrintBanner（名前わかりにくくない？）を作ることで実現する
 public class Banner {
@@ -24,10 +25,9 @@ public class Banner {
 }
 
 public interface Print {
-    public abstract void printWeak();
-    public abstract void printStrong();
+    void printWeak();
+    void printStrong();
 }
-
 public class PrintBanner extends Banner implements Print {
     public PrintBanner(String s) {
         super(s);
