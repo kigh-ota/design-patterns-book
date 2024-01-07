@@ -1,0 +1,101 @@
+#!/usr/bin/java --source 18
+
+import java.util.function.Supplier;
+
+/**
+ * PrinterProxyクラスがPrinterクラスを知らないように修正する
+ * 回答：Printable型のみを持つようにする。PrinterProxyのコンストラクタに、Printableの実装を生成するメソッドを渡せるようにする。
+ */
+public class Main {
+    public static void main(String[] args) {
+        Printable p = new PrinterProxy("Alice", Printer::new);
+        System.out.println("Name is currently " + p.getPrinterName());
+        p.setPrinterName("Bob");
+        System.out.println("Name is currently " + p.getPrinterName());
+        p.print("Hello, world");
+    }
+}
+
+interface Printable {
+    void setPrinterName(String name);
+
+    String getPrinterName();
+
+    void print(String string);
+}
+
+public class Printer implements Printable {
+    private String name;
+
+    public Printer() {
+        heavyJob("Initiating Printer instance");
+    }
+
+    public Printer(String name) {
+        this.name = name;
+        heavyJob("Initiating Printer instance(" + name + ")");
+    }
+
+    public void setPrinterName(String name) {
+        this.name = name;
+    }
+
+    public String getPrinterName() {
+        return name;
+    }
+
+    public void print(String string) {
+        System.out.println("=== " + name + " ===");
+        System.out.println(string);
+    }
+
+    private void heavyJob(String msg) {
+        System.out.print(msg);
+        for (int i = 0; i < 5; i++) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ignored) {
+            }
+            System.out.print(".");
+        }
+        System.out.println("Done.");
+    }
+}
+
+public class PrinterProxy implements Printable {
+    private String name;
+    private Printable real;
+    private final Supplier<Printable> realSupplier;
+
+    public PrinterProxy(Supplier<Printable> realSupplier) {
+        this.realSupplier = realSupplier;
+    }
+
+    public PrinterProxy(String name, Supplier<Printable> realSupplier) {
+        this.name = name;
+        this.realSupplier = realSupplier;
+    }
+
+    public synchronized void setPrinterName(String name) {
+        if (real != null) {
+            real.setPrinterName(name);
+        }
+        this.name = name;
+    }
+
+    public String getPrinterName() {
+        return name;
+    }
+
+    public void print(String string) {
+        realize();
+        real.print(string);
+    }
+
+    private synchronized void realize() {
+        if (real == null) {
+            real = realSupplier.get();
+            real.setPrinterName(name);
+        }
+    }
+}
