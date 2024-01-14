@@ -1,0 +1,2 @@
+foo@example.com=Foo Foo
+bar@example.com=Bar Bar

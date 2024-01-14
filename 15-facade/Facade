@@ -1,0 +1,88 @@
+#!/usr/bin/java --source 18
+
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Properties;
+
+public class Main {
+    public static void main(String[] args) {
+        PageMaker.makeWelcomePage("foo@example.com", "welcome.html");
+    }
+}
+
+// メールアドレスを与えられて、Webページを生成する
+// 必要なクラスを使う窓口(Facade)クラス (PageMaker) を作る
+// Given:
+// - メールアドレスからユーザー名を得るクラス (Database)
+// - HTMLファイルを作成するクラス (HtmlWriter)
+
+public class Database {
+    private Database() {
+    } // インスタンス生成の禁止
+
+    public static Properties getProperties(String dbname) {
+        var filename = dbname + ".txt";
+        var prop = new Properties();
+        try {
+            prop.load(new FileInputStream(filename));
+        } catch (IOException e) {
+            System.out.println("Warning: " + filename + " is not found.");
+        }
+        return prop;
+    }
+}
+
+public class HtmlWriter {
+    private Writer writer;
+
+    public HtmlWriter(Writer writer) {
+        this.writer = writer;
+    }
+
+    public void title(String title) throws IOException {
+        writer.write("<html>");
+        writer.write("<head>");
+        writer.write("<title>" + title + "</title>");
+        writer.write("</head>");
+        writer.write("<body>\n");
+        writer.write("<h1>" + title + "</h1>\n");
+    }
+
+    public void paragraph(String msg) throws IOException {
+        writer.write("<p>" + msg + "</p>\n");
+    }
+
+    public void link(String href, String caption) throws IOException {
+        paragraph("<a href=\"" + href + "\">" + caption + "</a>");
+    }
+    public void mailto(String mailaddr, String username) throws IOException {
+        link("mailto:" + mailaddr, username);
+    }
+    public void close() throws IOException {
+        writer.write("</body>");
+        writer.write("</html>\n");
+        writer.close();
+    }
+}
+
+public class PageMaker {
+    private PageMaker() {} // インスタンス生成を禁止
+
+    public static void makeWelcomePage(String mailaddr, String filename) {
+        try {
+            var mailprop = Database.getProperties("maildata");
+            var username = mailprop.getProperty(mailaddr);
+            var writer = new HtmlWriter(new FileWriter(filename));
+            writer.title("Welcome to " + username + "'s page!");
+            writer.paragraph(username + "のページへようこそ。");
+            writer.paragraph("メールまっていますね。");
+            writer.mailto(mailaddr, username);
+            writer.close();
+            System.out.println(filename + " is created for " + mailaddr + " (" + username + ")");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
