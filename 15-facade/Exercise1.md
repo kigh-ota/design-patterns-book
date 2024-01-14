@@ -1,0 +1,1 @@
+Database, HtmlWriterクラスの定義をpublicでなくpackage privateに変える
